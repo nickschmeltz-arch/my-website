@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lake Athletic Development — Check-In</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a1628;
+    --deep: #0d1f3c;
+    --blue: #1a56db;
+    --sky: #38bdf8;
+    --gold: #f5c518;
+    --white: #f0f4ff;
+    --muted: #8899bb;
+    --card: #111d35;
+    --success: #22c55e;
+    --error: #ef4444;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    background: var(--navy);
+    font-family: 'Barlow', sans-serif;
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    overflow-x: hidden;
+  }
+
+  /* Background grid pattern */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(26,86,219,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(26,86,219,0.06) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glow orb */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -120px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(26,86,219,0.25) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .logo-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(135deg, var(--blue), var(--sky));
+    border-radius: 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 0 32px rgba(26,86,219,0.5), 0 0 64px rgba(26,86,219,0.2);
+    position: relative;
+  }
+
+  .logo-mark svg {
+    width: 38px;
+    height: 38px;
+  }
+
+  .logo-mark::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 20px;
+    border: 1px solid rgba(56,189,248,0.4);
+  }
+
+  .org-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 28px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--white);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .org-sub {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--sky);
+  }
+
+  /* Card */
+  .card {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px;
+    padding: 32px 28px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--blue), var(--sky), var(--gold));
+    border-radius: 2px 2px 0 0;
+  }
+
+  .session-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(26,86,219,0.15);
+    border: 1px solid rgba(26,86,219,0.35);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--sky);
+    letter-spacing: 0.05em;
+    margin-bottom: 20px;
+  }
+
+  .session-badge .dot {
+    width: 6px; height: 6px;
+    background: var(--sky);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .card-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+
+  .card-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  /* Date/Time display */
+  .datetime {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .dt-pill {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--muted);
+    flex: 1;
+    text-align: center;
+  }
+
+  .dt-pill span {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--white);
+    margin-top: 2px;
+  }
+
+  /* Form */
+  .field-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .input-wrap {
+    position: relative;
+    margin-bottom: 16px;
+  }
+
+  input[type="text"], select {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 16px;
+    color: var(--white);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+  }
+
+  input[type="text"]::placeholder {
+    color: rgba(136,153,187,0.5);
+  }
+
+  input[type="text"]:focus, select:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(26,86,219,0.2);
+    background: rgba(26,86,219,0.06);
+  }
+
+  select option {
+    background: var(--deep);
+    color: var(--white);
+  }
+
+  /* Workout type chips */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .chip {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .chip:hover { border-color: rgba(26,86,219,0.5); color: var(--sky); }
+
+  .chip.active {
+    background: rgba(26,86,219,0.2);
+    border-color: var(--blue);
+    color: var(--sky);
+  }
+
+  /* Submit button */
+  .btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--blue), #1d4fd8);
+    border: none;
+    border-radius: 12px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(26,86,219,0.4);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 28px rgba(26,86,219,0.55);
+  }
+
+  .btn:active:not(:disabled) { transform: translateY(0); }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn.loading::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%);
+    animation: shimmer 1.2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  /* Success state */
+  .success-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 16px 0;
+  }
+
+  .success-icon {
+    width: 72px; height: 72px;
+    background: rgba(34,197,94,0.15);
+    border: 2px solid var(--success);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.4); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .success-icon svg { width: 36px; height: 36px; color: var(--success); }
+
+  .success-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 26px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+
+  .success-msg {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .success-detail {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .s-pill {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .s-pill strong { display: block; font-size: 13px; color: var(--white); }
+
+  .btn-again {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-again:hover { color: var(--white); border-color: rgba(255,255,255,0.25); }
+
+  /* Error message */
+  .error-msg {
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #fca5a5;
+    margin-bottom: 14px;
+    display: none;
+  }
+
+  /* Config notice */
+  .config-notice {
+    background: rgba(245,197,24,0.08);
+    border: 1px solid rgba(245,197,24,0.25);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 12px;
+    color: #fde68a;
+    margin-top: 16px;
+    line-height: 1.6;
+  }
+
+  .config-notice strong {
+    display: block;
+    font-size: 13px;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+
+  .config-notice code {
+    background: rgba(0,0,0,0.3);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 11px;
+    color: #fde68a;
+    word-break: break-all;
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 20px;
+    font-size: 11px;
+    color: rgba(136,153,187,0.4);
+    letter-spacing: 0.05em;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-mark">
+      <!-- Shield / Athletic icon -->
+      <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19 3L5 9v10c0 8.5 5.9 16.4 14 18.9C27.1 35.4 33 27.5 33 19V9L19 3z" fill="white" fill-opacity="0.15" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M13 19l4 4 8-8" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="org-name">Lake Athletic</div>
+    <div class="org-sub">Development Program</div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="card">
+
+    <!-- Form View -->
+    <div id="formView">
+      <div class="session-badge">
+        <span class="dot"></span>
+        <span id="liveSession">Session Open</span>
+      </div>
+
+      <div class="card-title">Athlete Check-In</div>
+      <div class="card-sub">Sign in to log your attendance</div>
+
+      <div class="datetime">
+        <div class="dt-pill">Date<span id="todayDate">—</span></div>
+        <div class="dt-pill">Time<span id="nowTime">—</span></div>
+      </div>
+
+      <!-- Name -->
+      <div class="field-label">Full Name</div>
+      <div class="input-wrap">
+        <input type="text" id="nameInput" placeholder="e.g. Jordan Smith" autocomplete="off" autocorrect="off" spellcheck="false">
+      </div>
+
+      <!-- Workout Type -->
+      <div class="field-label">Workout Type</div>
+      <div class="chips" id="chips">
+        <div class="chip active" data-val="Morning Lift">Morning Lift</div>
+        <div class="chip" data-val="Speed Work">Speed Work</div>
+        <div class="chip" data-val="Conditioning">Conditioning</div>
+        <div class="chip" data-val="Skills Practice">Skills Practice</div>
+        <div class="chip" data-val="Recovery">Recovery</div>
+        <div class="chip" data-val="Open Gym">Open Gym</div>
+      </div>
+
+      <div class="error-msg" id="errorMsg">Please enter your name before checking in.</div>
+
+      <button class="btn" id="checkInBtn" onclick="handleCheckIn()">
+        Check In ✓
+      </button>
+
+      <!-- Setup notice -->
+      <div class="config-notice" id="configNotice">
+        <strong>⚙️ Coach Setup Required</strong>
+        Replace <code>YOUR_SCRIPT_URL_HERE</code> in the JS below with your Google Apps Script Web App URL to enable logging. See the setup guide below.
+      </div>
+    </div>
+
+    <!-- Success View -->
+    <div id="successView" class="success-screen">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <div class="success-name" id="successName"></div>
+      <div class="success-msg">You're checked in. Let's work.</div>
+      <div class="success-detail">
+        <div class="s-pill"><strong id="successWorkout"></strong>Workout</div>
+        <div class="s-pill"><strong id="successTime"></strong>Time</div>
+      </div>
+      <button class="btn-again" onclick="resetForm()">← Check in another athlete</button>
+    </div>
+
+  </div>
+
+  <div class="footer">Lake Athletic Development &nbsp;·&nbsp; Attendance System</div>
+</div>
+
+<script>
+  // ─────────────────────────────────────────────────────────────────
+  // COACH CONFIG: Paste your Google Apps Script Web App URL here
+  // ─────────────────────────────────────────────────────────────────
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlv0zZt3VWQUuHBxkK60qAjOiJcujTPnZO7uTpcXah0FvqNv-QuZNAoVhc84TeQSi_/exec";
+  // ─────────────────────────────────────────────────────────────────
+
+  let selectedWorkout = "Morning Lift";
+
+  // Chip selection
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      selectedWorkout = chip.dataset.val;
+    });
+  });
+
+  // Live clock
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('todayDate').textContent = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    document.getElementById('nowTime').textContent = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  }
+  updateClock();
+  setInterval(updateClock, 15000);
+
+  // Hide config notice if URL is set
+  if (SCRIPT_URL !== "YOUR_SCRIPT_URL_HERE") {
+    document.getElementById('configNotice').style.display = 'none';
+  }
+
+  // Enter key support
+  document.getElementById('nameInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleCheckIn();
+  });
+
+  async function handleCheckIn() {
+    const name = document.getElementById('nameInput').value.trim();
+    const errEl = document.getElementById('errorMsg');
+
+    if (!name) {
+      errEl.style.display = 'block';
+      document.getElementById('nameInput').focus();
+      return;
+    }
+
+    errEl.style.display = 'none';
+
+    const btn = document.getElementById('checkInBtn');
+    btn.textContent = 'Logging...';
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    const now = new Date();
+    const timestamp = now.toLocaleString('en-US');
+    const dateStr = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+    const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+    const payload = {
+      name,
+      workout: selectedWorkout,
+      date: dateStr,
+      time: timeStr,
+      timestamp
+    };
+
+    if (SCRIPT_URL !== "YOUR_SCRIPT_URL_HERE") {
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } catch (e) {
+        console.error('Logging error:', e);
+      }
+    }
+
+    // Show success
+    document.getElementById('successName').textContent = name;
+    document.getElementById('successWorkout').textContent = selectedWorkout;
+    document.getElementById('successTime').textContent = timeStr;
+
+    document.getElementById('formView').style.display = 'none';
+    const sv = document.getElementById('successView');
+    sv.style.display = 'flex';
+
+    // Auto-reset after 8 seconds
+    setTimeout(resetForm, 8000);
+  }
+
+  function resetForm() {
+    document.getElementById('nameInput').value = '';
+    document.getElementById('errorMsg').style.display = 'none';
+
+    const btn = document.getElementById('checkInBtn');
+    btn.textContent = 'Check In ✓';
+    btn.classList.remove('loading');
+    btn.disabled = false;
+
+    document.getElementById('formView').style.display = 'block';
+    document.getElementById('successView').style.display = 'none';
+
+    // Reset chips to first
+    document.querySelectorAll('.chip').forEach((c, i) => {
+      c.classList.toggle('active', i === 0);
+    });
+    selectedWorkout = "Morning Lift";
+  }
+</script>
+</body>
+</html>
